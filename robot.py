@@ -3,6 +3,7 @@
 #library includes
 import wpilib
 from wpilib import RobotDrive
+
 #from networktables import NetworkTable
 
 #User Includes
@@ -44,7 +45,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.climberMotor = wpilib.VictorSP(6)
         
         # Hopper Agitator motor(s)
-        self.hopperAgitatorMotor = wpilib.VIctorSP(7)
+        self.hopperAgitatorMotor = wpilib.VictorSP(7)
         
         # Conveyor Motor(s)
         self.conveyorMotor = wpilib.VictorSP(8)
@@ -121,6 +122,8 @@ class MyRobot(wpilib.IterativeRobot):
         try:
             """This function is called periodically during autonomous."""
             self.robotDrive.setSafetyEnabled(False) #IMPORTANT! DO NOT REMOVE!
+
+            
             
         except:
             pass
@@ -175,22 +178,16 @@ class MyRobot(wpilib.IterativeRobot):
             
             # Conveyor Controls:
             if self.game_pad.getRawButton(6) or self.stick1.getRawButton(3):
-                self.conveyorMotor.set(1)
-            else:
-                self.conveyorMotor.set(0)
-                
-            if self.game_pad.getRawButton(3) or self.stick1.getRawButton(2):
+                self.conveyorMotor.set(1)      
+            elif self.game_pad.getRawButton(3) or self.stick1.getRawButton(2):
                 self.conveyorMotor.set(-0.6)
             else:
                 self.conveyorMotor.set(0)
             
             # Climbing Controls
             if self.game_pad.getRawButton(4) or self.stick2.getRawButton(3):
-                self.climberMotor.set(0.7)
-            else:
-                self.climberMotor.set(0)
-                
-            if self.game_pad.getRawButton(1) or self.stick2.getRawButton(2):
+                self.climberMotor.set(1)
+            elif self.game_pad.getRawButton(1) or self.stick2.getRawButton(2):
                 self.climberMotor.set(-0.5)
             else:
                 self.climberMotor.set(0)
