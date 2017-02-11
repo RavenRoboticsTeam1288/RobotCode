@@ -160,7 +160,7 @@ class MyRobot(wpilib.IterativeRobot):
         
             # Use the joystick X axis for lateral movement, Y axis for forward movement, and stick 2 X axis for rotation.
             # This sample does not use field-oriented drive, so the gyro input is set to zero.
-            self.robotDrive.mecanumDrive_Cartesian(stick2_X,
+            self.robotDrive.mecanumDrive_Cartesian(-stick2_X,
                                                    stick2_Y,
                                                    stick1_X, 0)
                
@@ -170,8 +170,8 @@ class MyRobot(wpilib.IterativeRobot):
             
             #Spin up shooter
             if self.game_pad.getRawButton(7) or self.stick1.getRawButton(1):
-                self.shooterMotorOne.set(0.8)
-                self.shooterMotorTwo.set(0.8)
+                self.shooterMotorOne.set(-0.8)
+                self.shooterMotorTwo.set(-0.8)
             else:
                 self.shooterMotorOne.set(0)
                 self.shooterMotorTwo.set(0)
