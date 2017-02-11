@@ -162,7 +162,7 @@ class MyRobot(wpilib.IterativeRobot):
             # This sample does not use field-oriented drive, so the gyro input is set to zero.
             self.robotDrive.mecanumDrive_Cartesian(stick1_X,
                                                    stick1_Y,
-                                                   stick2_X, 0);
+                                                   stick2_X, 0)
                
             # Other Controls Below
             
