@@ -25,7 +25,7 @@ class MyRobot(wpilib.IterativeRobot):
         """
         #TODO: Update networktables implementation
         #self.sd = NetworkTable.getTable('SmartDashboard')
-        
+
         # Joysticks
         self.stick1 = wpilib.Joystick(1)#left
         self.stick2 = wpilib.Joystick(2)#right
@@ -68,14 +68,14 @@ class MyRobot(wpilib.IterativeRobot):
         #self.robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontRight, True)
         #
         ## you may need to change or remove this to match your robot
-        #self.robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, True)
-        #self.robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, True) 
+        self.robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, True)
+        self.robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, True) 
         
         # Sensors
         
         
         # initialize the gyro (ANALOG INPUT)
-        self.gyro = wpilib.AnalogGyro(0)
+        #self.gyro = wpilib.AnalogGyro(0)
         
         #Timer
         self.timer = wpilib.Timer()
@@ -141,9 +141,9 @@ class MyRobot(wpilib.IterativeRobot):
         pass
 
     def teleopPeriodic(self):
-        try:
+        #try:
             """This function is called periodically during operator control."""
-            self.robotDrive.setSafetyEnabled(True) #IMPORTANT! DO NOT REMOVE!
+            #self.robotDrive.setSafetyEnabled(True) #IMPORTANT! DO NOT REMOVE!
             
             stick1_X = self.stick1.getX()#left
             stick2_Y = self.stick2.getY()#right
@@ -160,16 +160,16 @@ class MyRobot(wpilib.IterativeRobot):
         
             # Use the joystick X axis for lateral movement, Y axis for forward movement, and stick 2 X axis for rotation.
             # This sample does not use field-oriented drive, so the gyro input is set to zero.
-            self.robotDrive.mecanumDrive_Cartesian(stick1_X,
-                                                   stick1_Y,
-                                                   stick2_X, 0)
+            self.robotDrive.mecanumDrive_Cartesian(stick2_X,
+                                                   stick2_Y,
+                                                   stick1_X, 0)
                
             # Other Controls Below
             
             # Shooter Controls:
             
             #Spin up shooter
-            if self.game_pad.gerRawButton(7) or self.stick1.getRawButton(1):
+            if self.game_pad.getRawButton(7) or self.stick1.getRawButton(1):
                 self.shooterMotorOne.set(0.8)
                 self.shooterMotorTwo.set(0.8)
             else:
@@ -200,8 +200,8 @@ class MyRobot(wpilib.IterativeRobot):
             #    self.defenceArmRotate.set(1)
             #else:
             #    self.defenceArmRotate.set(0)
-        except:
-            pass
+        #except:
+        #    pass
            
 
 if __name__ == '__main__':
