@@ -4,7 +4,7 @@
 import wpilib
 from wpilib import RobotDrive
 
-#from networktables import NetworkTable
+from networktables import NetworkTable
 
 #User Includes
 from Utilities import UtilityFunctions
@@ -24,7 +24,11 @@ class MyRobot(wpilib.IterativeRobot):
         should be used for any initialization code.
         """
         #TODO: Update networktables implementation
-        #self.sd = NetworkTable.getTable('SmartDashboard')
+        self.sd = NetworkTable.getTable('SmartDashboard')
+        
+        #Encoder
+        #self.digitalSource = wpilib.DigitalSource(1, True)
+        #self.encoder = wpilib.Encoder(digitalSource, digitalSource)
 
         # Joysticks
         self.stick1 = wpilib.Joystick(1)#left
@@ -75,7 +79,7 @@ class MyRobot(wpilib.IterativeRobot):
         
         
         # initialize the gyro (ANALOG INPUT)
-        #self.gyro = wpilib.AnalogGyro(0)
+        self.gyro = wpilib.AnalogGyro(0)
         
         #Timer
         self.timer = wpilib.Timer()
@@ -163,6 +167,8 @@ class MyRobot(wpilib.IterativeRobot):
             self.robotDrive.mecanumDrive_Cartesian(-stick2_X,
                                                    stick2_Y,
                                                    stick1_X, 0)
+                                                   
+            
                
             # Other Controls Below
             
@@ -186,9 +192,9 @@ class MyRobot(wpilib.IterativeRobot):
             
             # Climbing Controls
             if self.game_pad.getRawButton(4) or self.stick2.getRawButton(3):
-                self.climberMotor.set(1)
+                self.climberMotor.set(-1)
             elif self.game_pad.getRawButton(1) or self.stick2.getRawButton(2):
-                self.climberMotor.set(-0.5)
+                self.climberMotor.set(0.5)
             else:
                 self.climberMotor.set(0)
          

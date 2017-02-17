@@ -18,7 +18,7 @@ class AutoStates():
             #drive straight
 
     """
-    placeGear is a boolean, crossOn is a string (left, right)
+    placeGear is a boolean, crossOn is a string (left, right, leftFromPeg, rightFromPeg)
     """
     def middle(MyRobot, placeGear, crossOn):
         if step == "":
@@ -30,16 +30,22 @@ class AutoStates():
         if step == "lineUp":
             #Spin robot to line up to goal
         if step == "go":
-            #driveNumSeconds to the peg
-            #At the end here set step = to 'leftFromPeg' or 'rightFromPeg'
+            done = UtilityFunctions.driveNumInches(self, 0, 1, 0.5) #replace 0 with the distance to the peg
+            if done:
+                if crossOn != "":
+                    step = crossOn
         if step == "leftFromPeg"
-            #cross the line on the left from the peg
+            done = UtilityFunctions.driveNumInches(self, 0, -1, 0.5) #replace 0 with the distance to back up
+            if done:
+                turn = UtilityFunctions.turnNumDegrees(self, 0) #replace 0 with degrees to turn
+                if turn:
+                    drive = UtilityFunctions.driveForTime(self, 0.5, 0) #replce 0 with amount of time to drive
         if step == "rightFromPeg"
-            #cross the line on the right from the peg
-        if step == "left":
-            #cross the line on the left
-        if step == "right"
-            #cross the line on the right
+                        done = UtilityFunctions.driveNumInches(self, 0, -1, 0.5) #replace 0 with the distance to back up
+            if done:
+                turn = UtilityFunctions.turnNumDegrees(self, 0) #replace 0 with degrees to turn
+                if turn:
+                    drive = UtilityFunctions.driveForTime(self, 0.5, 0) #replce 0 with amount of time to drive
             
     def right(MyRobot, placeGear, shootBalls):
         if step == "":
