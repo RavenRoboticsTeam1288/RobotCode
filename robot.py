@@ -8,7 +8,7 @@ from networktables import NetworkTable
 
 #User Includes
 from Utilities import UtilityFunctions
-#from AutonomousStates import AutoStates
+from AutonomousStates import AutoStates
 
 
 #This robot uses Mechanum Drive
@@ -23,12 +23,10 @@ class MyRobot(wpilib.IterativeRobot):
         This function is called upon program startup and
         should be used for any initialization code.
         """
-        #TODO: Update networktables implementation
         self.sd = NetworkTable.getTable('SmartDashboard')
         
         #Encoder
-        #self.digitalSource = wpilib.DigitalSource(1, True)
-        #self.encoder = wpilib.Encoder(digitalSource, digitalSource)
+        self.encoder = wpilib.Counter(1)
 
         # Joysticks
         self.stick1 = wpilib.Joystick(1)#left
@@ -58,6 +56,9 @@ class MyRobot(wpilib.IterativeRobot):
         self.portServo = wpilib.Servo(10) #Looking from inside the robot towards the front, this is the left servo
         self.starboardServo = wpilib.Servo(11) #Looking from inside the robot towards the front, this is the right servo
         
+        # Shooter Servo. Connected on the extension board
+        self.shooterServo = wpilib.Servo(12)
+        
         
         #robot drive
         self.robotDrive = wpilib.RobotDrive(self.leftFrontMotor,
@@ -79,7 +80,7 @@ class MyRobot(wpilib.IterativeRobot):
         
         
         # initialize the gyro (ANALOG INPUT)
-        self.gyro = wpilib.AnalogGyro(0)
+        self.gyro = wpilib.AnalogGyro(1)
         
         #Timer
         self.timer = wpilib.Timer()
@@ -99,8 +100,8 @@ class MyRobot(wpilib.IterativeRobot):
         self.acceptable_heading_error = 5 # the range (+- degrees) that the heading can be off of desired that we still consider good
         self.slower_speed_band = 20  # When +-20 degrees from desired heading, turn slower to avoid overshooting
         
-        self.autoSlowTurnSpeed = 0.4 #slow speed
-        self.autoNormalTurnSpeed = 0.8 #normal speed
+        self.autoSlowTurnSpeed = 0.3 #slow speed
+        self.autoNormalTurnSpeed = 0.6 #normal speed
         
         #AutoStates variables
         self.choose_direction_state = "begin"
@@ -123,14 +124,42 @@ class MyRobot(wpilib.IterativeRobot):
         
         
     def autonomousPeriodic(self):
-        try:
+        #try:
             """This function is called periodically during autonomous."""
-            self.robotDrive.setSafetyEnabled(False) #IMPORTANT! DO NOT REMOVE!
-
+            self.robotDrive.setSafetyEnabled(False) #IMPORTANT! DO NOT REMOVE
             
+            # At beginning of autonomous, release the gear ramps
+            self.portServo.setAngle(90)
+            self.starboardServo.setAngle(90)
             
-        except:
-            pass
+            print("Its in the top")
+            if self.autonomous_state == "begin":
+                done = False
+                
+                print("Hello dumbass")
+                
+            #################### AUTO TESTING CODE ####################
+            
+            # Test Encoder
+                # Drive for 24 inches
+                #done = UtilityFunctions.driveNumInches(self, 99999, 1, 0.3)
+            # Test Gyro
+                # Turn 90 Degrees Right
+                #done = UtilityFunctions.turnNumDegrees(self, 90)
+            # Test Camera
+                # Follow a target
+                AutoStates.findDatGoal(self, 0.3, "none")
+            #################### END AUTO TESTING #####################
+            
+                if done:
+                    self.autonomous_state = "done"
+                    self.leftBackMotor.set(0)
+                    self.leftFrontMotor.set(0)
+                    self.rightBackMotor.set(0)
+                    self.rightFrontMotor.set(0)
+            
+        #except:
+        #    pass
             
     def disabledInit(self):
         '''Calledonly ar the beginning of disabled mode'''
@@ -174,10 +203,16 @@ class MyRobot(wpilib.IterativeRobot):
             
             # Shooter Controls:
             
-            #Spin up shooter
+            # SHOOT!
+            if self.game_pad.getRawButton(8) or self.stick2.getRawButton(1):
+                self.shooterServo.setAngle(90)
+            else:
+                self.shooterServo.setAngle(0)
+            
+            # Spin up shooter
             if self.game_pad.getRawButton(7) or self.stick1.getRawButton(1):
-                self.shooterMotorOne.set(-0.8)
-                self.shooterMotorTwo.set(-0.8)
+                self.shooterMotorOne.set(-.8)
+                self.shooterMotorTwo.set(-.8)
             else:
                 self.shooterMotorOne.set(0)
                 self.shooterMotorTwo.set(0)
@@ -193,19 +228,10 @@ class MyRobot(wpilib.IterativeRobot):
             # Climbing Controls
             if self.game_pad.getRawButton(4) or self.stick2.getRawButton(3):
                 self.climberMotor.set(-1)
-            elif self.game_pad.getRawButton(1) or self.stick2.getRawButton(2):
-                self.climberMotor.set(0.5)
             else:
                 self.climberMotor.set(0)
          
             
-            #if self.stick2.getRawButton(2):
-            #    self.defenceArmRotate.set(-.5)
-            #
-            #elif self.stick2.getRawButton(3):
-            #    self.defenceArmRotate.set(1)
-            #else:
-            #    self.defenceArmRotate.set(0)
         #except:
         #    pass
            

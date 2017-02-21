@@ -39,16 +39,16 @@ class UtilityFunctions():
                 robot.autoSafeToGetHeading = True
                 return True
             elif abs(value) <= robot.slower_speed_band:
-                robot.leftFrontMotor.set(-1*robot.autoSlowTurnSpeed)
-                robot.leftBackMotor.set(-1*robot.autoSlowTurnSpeed)
-                robot.rightFrontMotor.set(-1*robot.autoSlowTurnSpeed)
-                robot.rightBackMotor.set(-1*robot.autoSlowTurnSpeed)
+                robot.leftFrontMotor.set(1*robot.autoSlowTurnSpeed)
+                robot.leftBackMotor.set(1*robot.autoSlowTurnSpeed)
+                robot.rightFrontMotor.set(1*robot.autoSlowTurnSpeed)
+                robot.rightBackMotor.set(1*robot.autoSlowTurnSpeed)
                 return False
             else:
-                robot.leftFrontMotor.set(-1*robot.autoNormalTurnSpeed)
-                robot.leftBackMotor.set(-1*robot.autoNormalTurnSpeed)
-                robot.rightFrontMotor.set(-1*robot.autoNormalTurnSpeed)
-                robot.rightBackMotor.set(-1*robot.autoNormalTurnSpeed)
+                robot.leftFrontMotor.set(1*robot.autoNormalTurnSpeed)
+                robot.leftBackMotor.set(1*robot.autoNormalTurnSpeed)
+                robot.rightFrontMotor.set(1*robot.autoNormalTurnSpeed)
+                robot.rightBackMotor.set(1*robot.autoNormalTurnSpeed)
                 return False
         elif ((value < 0 and abs(value) > 180) or (value > 0 and abs(value) < 180)): #TURN LEFT
             if abs(value) <= robot.acceptable_heading_error:
@@ -59,16 +59,16 @@ class UtilityFunctions():
                 robot.autoSafeToGetHeading = True
                 return True
             elif abs(value) <= robot.slower_speed_band:    
-                robot.leftFrontMotor.set(robot.autoSlowTurnSpeed)
-                robot.leftBackMotor.set(robot.autoSlowTurnSpeed)
-                robot.rightFrontMotor.set(robot.autoSlowTurnSpeed)
-                robot.rightBackMotor.set(robot.autoSlowTurnSpeed)
+                robot.leftFrontMotor.set(-1*robot.autoSlowTurnSpeed)
+                robot.leftBackMotor.set(-1*robot.autoSlowTurnSpeed)
+                robot.rightFrontMotor.set(-1*robot.autoSlowTurnSpeed)
+                robot.rightBackMotor.set(-1*robot.autoSlowTurnSpeed)
                 return False
             else:
-                robot.leftFrontMotor.set(robot.autoNormalTurnSpeed)
-                robot.leftBackMotor.set(robot.autoNormalTurnSpeed)
-                robot.rightFrontMotor.set(robot.autoNormalTurnSpeed)
-                robot.rightBackMotor.set(robot.autoNormalTurnSpeed)
+                robot.leftFrontMotor.set(-1*robot.autoNormalTurnSpeed)
+                robot.leftBackMotor.set(-1*robot.autoNormalTurnSpeed)
+                robot.rightFrontMotor.set(-1*robot.autoNormalTurnSpeed)
+                robot.rightBackMotor.set(-1*robot.autoNormalTurnSpeed)
                 return False
         else:
             #hopefully we never get here
@@ -94,6 +94,12 @@ class UtilityFunctions():
             return time
         else:
             return initTime
+            
+    def resetEncoderValue(robot, myEncoder, safeToResetEncoder):
+        if safeToResetEncoder:
+            myEncoder.reset()
+        else:
+            pass
             
     #Drive a motor a certain num seconds at the specified speed and direction        
     #Direction of 1 means FORWARD, -1 means BACKWARDS
@@ -122,13 +128,16 @@ class UtilityFunctions():
     #Function to handle the digital encoder for driving forward num inches
     # Direction will either be 1 (FORWARD) or -1 (REVERSE)
     def driveNumInches(robot, num, direction, speed):
-        inches_distance = abs(robot.encoder.get()) * .035 # (100 ticks ~ 3.5 inches)
+        print
+        UtilityFunctions.resetEncoderValue(robot, self.encoder, robot.autoSafeToResetEncoder)
+        inches_distance = abs(robot.encoder.get()) * .035 # (100 ticks ~ 3.5 inches) TODO: new conversion value?????????
         if inches_distance < num:
             #not there yet, keep going and return false (FORWARD)
             robot.leftFrontMotor.set(direction * -1 * speed)
             robot.leftBackMotor.set(direction * -1 * speed)
             robot.rightFrontMotor.set(direction * speed)
             robot.rightBackMotor.set(direction * speed)
+            robot.autoSafeToResetEncoder = False
             return False
         else:
             #reached the end, stop and return true (STOP)
@@ -136,6 +145,7 @@ class UtilityFunctions():
             robot.leftBackMotor.set(0)
             robot.rightFrontMotor.set(0)
             robot.rightBackMotor.set(0)
+            robot.autoSafeToResetEncoder = True
             return True
             
     #Use the values from networkTables from the camera to determine which direction to turn the robot to align
@@ -146,38 +156,37 @@ class UtilityFunctions():
         #If too much time passes without getting a valid target, then assume we are not looking in the right
         #direction and stop trying
         
-        #direction = robot.ERROR
-        ##Get the COG_X (and maybe COG_Y) network table values. X is what is important, we want X to be close to 80 (160 x 120 images) to be center
-        #if robot.sd.containsKey('COG_X') and robot.sd.containsKey('COG_Y'):
-        #    x = robot.sd.getValue('COG_X')
-        #    y = robot.sd.getValue('COG_Y')
-        #    
-        #    #make sure we can see a target, otherwise use last valid value
-        #    if x == 0 or y == 0:
-        #        if robot.lastCOG_X == 0 or robot.lastCOG_Y == 0:
-        #            #there is nothing we can do, no target, don't do anything!
-        #            direction = robot.ERROR
-        #        else:
-        #            x = robot.lastCOG_X
-        #            y = robot.lastCOG_Y
-        #    else:
-        #        robot.lastCOG_X = x
-        #        robot.lastCOG_Y = y
-        #        
-        #    #check the direction
-        #    if x >= 1 and x <= 75: #Guessing
-        #        direction = robot.GO_RIGHT
-        #    elif x > 75 and x <= 85:
-        #        direction = robot.ON_TARGET
-        #    elif x > 85 and x <= 160:
-        #        direction = robot.GO_LEFT
-        #    else:
-        #        direction = robot.ERROR
-        #        
-        #else:
-        #    #no keys, can't look for the target
-        #    direction = robot.ERROR
+        direction = robot.ERROR
+        print(robot.sd.getValue('COG_X'))
+        #Get the COG_X (and maybe COG_Y) network table values. X is what is important, we want X to be close to 80 (160 x 120 images) to be center
+        if robot.sd.containsKey('COG_X'):
+            x = robot.sd.getValue('COG_X')
             
+            #make sure we can see a target, otherwise use last valid value
+            if x == 0:
+                if robot.lastCOG_X == 0:
+                    #there is nothing we can do, no target, don't do anything!
+                    direction = robot.ERROR
+                else:
+                    x = robot.lastCOG_X
+            else:
+                robot.lastCOG_X = x
+                
+            #check the direction
+            #TODO: Update Target COG Location
+            if x >= 1 and x <= 75: #Guessing
+                direction = robot.GO_RIGHT
+            elif x > 75 and x <= 85:
+                direction = robot.ON_TARGET
+            elif x > 85 and x <= 160:
+                direction = robot.GO_LEFT
+            else:
+                direction = robot.ERROR
+                
+        else:
+            #no keys, can't look for the target
+            direction = robot.ERROR
+           
         #Lets NOT use this for now. we can enable it if necessary
         #if direction == robot.ERROR:
         #    robot.noGoalFoundCount += 1
@@ -186,8 +195,7 @@ class UtilityFunctions():
         #    robot.noGoalFoundCount = 0
         #    robot.lastCOG_X = 0
         #    robot.lastCOG_Y = 0
-            
-        direction = robot.ERROR
+        
         return direction
         
     def driveForTime(robot, speed, time):
