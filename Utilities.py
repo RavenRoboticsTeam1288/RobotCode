@@ -128,13 +128,13 @@ class UtilityFunctions():
     #Function to handle the digital encoder for driving forward num inches
     # Direction will either be 1 (FORWARD) or -1 (REVERSE)
     def driveNumInches(robot, num, direction, speed):
-        print
-        UtilityFunctions.resetEncoderValue(robot, self.encoder, robot.autoSafeToResetEncoder)
-        inches_distance = abs(robot.encoder.get()) * .035 # (100 ticks ~ 3.5 inches) TODO: new conversion value?????????
+        UtilityFunctions.resetEncoderValue(robot, robot.encoder, robot.autoSafeToResetEncoder)
+        inches_distance = abs(robot.encoder.get()) * .0267 # (100 ticks ~ 2.67 inches)
+        #print(abs(robot.encoder.get()))
         if inches_distance < num:
             #not there yet, keep going and return false (FORWARD)
-            robot.leftFrontMotor.set(direction * -1 * speed)
-            robot.leftBackMotor.set(direction * -1 * speed)
+            robot.leftFrontMotor.set(direction * speed)
+            robot.leftBackMotor.set(direction * speed)
             robot.rightFrontMotor.set(direction * speed)
             robot.rightBackMotor.set(direction * speed)
             robot.autoSafeToResetEncoder = False
@@ -157,7 +157,7 @@ class UtilityFunctions():
         #direction and stop trying
         
         direction = robot.ERROR
-        print(robot.sd.getValue('COG_X'))
+        #print(robot.sd.getValue('COG_X'))
         #Get the COG_X (and maybe COG_Y) network table values. X is what is important, we want X to be close to 80 (160 x 120 images) to be center
         if robot.sd.containsKey('COG_X'):
             x = robot.sd.getValue('COG_X')

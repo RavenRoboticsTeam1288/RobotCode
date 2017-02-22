@@ -8,7 +8,7 @@ from networktables import NetworkTable
 
 #User Includes
 from Utilities import UtilityFunctions
-from AutonomousStates import AutoStates
+#from AutonomousStates import AutoStates
 
 
 #This robot uses Mechanum Drive
@@ -86,6 +86,9 @@ class MyRobot(wpilib.IterativeRobot):
         self.timer = wpilib.Timer()
         self.timer.start()
         self.startTime = 0
+        
+        #shooter speed variable
+        self.shooterSpeed = -0.8
             
         #autonomous
         self.direction = "straight"
@@ -132,23 +135,23 @@ class MyRobot(wpilib.IterativeRobot):
             self.portServo.setAngle(90)
             self.starboardServo.setAngle(90)
             
-            print("Its in the top")
+            #print("Its in the top")
             if self.autonomous_state == "begin":
                 done = False
                 
-                print("Hello dumbass")
+                #print("Hello dumbass")
                 
             #################### AUTO TESTING CODE ####################
             
             # Test Encoder
                 # Drive for 24 inches
-                #done = UtilityFunctions.driveNumInches(self, 99999, 1, 0.3)
+                #done = UtilityFunctions.driveNumInches(self, 32, 1, 0.3)
             # Test Gyro
                 # Turn 90 Degrees Right
                 #done = UtilityFunctions.turnNumDegrees(self, 90)
             # Test Camera
                 # Follow a target
-                AutoStates.findDatGoal(self, 0.3, "none")
+                #AutoStates.findDatGoal(self, 0.3, "none")
             #################### END AUTO TESTING #####################
             
                 if done:
@@ -206,13 +209,15 @@ class MyRobot(wpilib.IterativeRobot):
             # SHOOT!
             if self.game_pad.getRawButton(8) or self.stick2.getRawButton(1):
                 self.shooterServo.setAngle(90)
+                self.hopperAgitatorMotor.set(0.8)
             else:
                 self.shooterServo.setAngle(0)
+                self.hopperAgitatorMotor.set(0)
             
             # Spin up shooter
             if self.game_pad.getRawButton(7) or self.stick1.getRawButton(1):
-                self.shooterMotorOne.set(-.8)
-                self.shooterMotorTwo.set(-.8)
+                self.shooterMotorOne.set(self.shooterSpeed)
+                self.shooterMotorTwo.set(self.shooterSpeed)
             else:
                 self.shooterMotorOne.set(0)
                 self.shooterMotorTwo.set(0)

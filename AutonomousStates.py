@@ -120,72 +120,109 @@ class AutoStates():
     """
     placeGear is a boolean, crossOn is a string (left, right, leftFromPeg, rightFromPeg)
     """
-    #def middle(MyRobot, placeGear, crossOn):
-    #    if step == "":
-    #        if placeGear:
-    #            step = "lineUp"
-    #        elif crossOn != "":
-    #            step = crossOn
-    #
-    #    if step == "lineUp":
-    #        #Spin robot to line up to goal
-    #    if step == "go":
-    #        done = False
-    #        done = UtilityFunctions.driveNumInches(self, 0, 1, 0.5) #replace 0 with the distance to the peg
-    #        if done:
-    #            if crossOn != "":
-    #                step = crossOn
-    #    if step == "leftFromPeg"
-    #        done = False
-    #        done = UtilityFunctions.driveNumInches(self, 0, -1, 0.5) #replace 0 with the distance to back up
-    #        if done:
-    #            turn = False
-    #            turn = UtilityFunctions.turnNumDegrees(self, 0) #replace 0 with degrees to turn
-    #            if turn:
-    #                UtilityFunctions.driveForTime(self, 0.5, 0) #replce 0 with amount of time to drive
-    #    if step == "rightFromPeg"
-    #        done= False
-    #        done = UtilityFunctions.driveNumInches(self, 0, -1, 0.5) #replace 0 with the distance to back up
-    #        if done:
-    #            turn = False
-    #            turn = UtilityFunctions.turnNumDegrees(self, 0) #replace 0 with degrees to turn
-    #            if turn:
-    #                UtilityFunctions.driveForTime(self, 0.5, 0) #replce 0 with amount of time to drive
-    #        
-    #def right(MyRobot, placeGear, shootBalls):
-    #
-    #    Myrobot.initialTime = UtilityFunctions.getAnInitialTimeStamp(Myrobot, Myrobot.initialTime, Myrobot.autoSafeToGetTime)
-    #
-    #    if step == "":
-    #        if shootBalls:
-    #            step = "shoot"
-    #        elif placeGear:
-    #            step = "lineUp"
-    #            
-    #    if step == "shoot"
-    #        shooterMotors = []
-    #        shooterMotors.append(Myrobot.shooterMotorOne, -0.8)
-    #        shooterMotors.append(Myrobot.shooterMoterTwo, -0.8)
-    #        reved = UtilityFunctions.driveMotorsNumSeconds(self, shooterMotors, 2, Myrobot.initialTime)
-    #        if reved:
-    #            done = False
-    #            done = UtilityFunctions.driveMotorsNumSeconds(self, shooterMotors, 5, Myrobot.initialTime)
-    #            UtilityFunctions.driveNumSeconds(self, Myrobot.hopperAgitatorMotor, 1, 0.5, 1, Myrobot.initialTime)
-    #            if done and placeGear:
-    #                step = "lineUp"
-    #            
-    #    if step == "lineUp":
-    #        #Spin robot to line up to goal
-    #        
-    #    if step == "go":
-    #        #driveNumSeconds to the peg
-    #        #At the end here set step = to 'leftFromPeg' or 'rightFromPeg'
-    #    if step == "leftFromPeg"
-    #        #cross the line on the left from the peg
-    #    if step == "rightFromPeg"
-    #        #cross the line on the right from the peg
-    #    if step == "left":
-    #        #cross the line on the left
-    #    if step == "right"
-    #
-        #cross the line on the right
+    def middle(MyRobot, placeGear, crossOn):
+        retVal = False
+        # Hopefully do some math to figure out how to place a gear using a Shaft encoder and a Gyro or Camera
+        if placeGear:
+            if MyRobot.choose_direction_state == "begin":
+                # Use the digital shaft encoder to drive forward enough to get in line with the Lift.
+                done = False
+                done = UtilityFunctions.driveNumInches(self, 0, 1, 0.5) #replace 0 with the distance to drive
+                if done:
+                    MyRobot.choose_direction_state = "wait_for_pilot"
+                    
+            elif MyRobot.choose_direction_state == "wait_for_pilot":
+                done = False
+                done = UtilityFunctions.driveForTime(MyRobot, 0, 5)
+                if done:
+                    MyRobot.choose_direction_state = "backup"
+                    
+            elif MyRobot.choose_direction_state == "backup":
+                # Backup off the lift... or don't
+                done = False
+                if crossOn == "left" or crossOn == "right":
+                    done = UtilityFunctions.driveForTime
+                else:
+                    
+                if done:
+                    MyRobot.choose_direction_state = ""
+                    
+            elif MyRobot.choose_direction_state == "score_the_gear":
+                # Use the digital shaft encoder to drive forward enough to place the gear on the peg
+                done = False
+                done = UtilityFunctions.driveNumInches(self, 0, 1, 0.5) #replace 0 with the distance to the peg
+                if done:
+                    retVal = True
+            
+        # Only Drive Forward to get 5 Points
+        else:
+            if MyRobot.choose_direction_state == "begin":
+                done = False
+                done = UtilityFunctions.driveNumInches(self, 72, 1, 0.5) #Drive 6 feet to cross the Base Line
+                if done:
+                    retVal = True
+                
+        return retVal
+            
+    def right(MyRobot, placeGear = True, useCamera = False, shoot = False):
+        retVal = False
+        # Hopefully do some math to figure out how to place a gear using a Shaft encoder and a Gyro or Camera
+        if shoot:
+            if MyRobot.choose_direction_state == "begin" or MyRobot.choose_direction_state == "prepare_to_shoot":
+                done = False
+                MyRobot.choose_direction_state = "prepare_to_shoot"
+                MyRobot.shooterMotorOne.set(MyRobot.shooterSpeed)
+                MyRobot.shooterMotorTwo.set(MyRobot.shooterSpeed)
+                done = UtilityFunctions.driveForTime(MyRobot, 0, 0.5)
+                if done:
+                    MyRobot.choose_direction_state = "shoot"
+                    
+            elif MyRobot.choose_direction_state == "shoot":
+                done = False
+                MyRobot.shooterMotorOne.set(MyRobot.shooterSpeed)
+                MyRobot.shooterMotorTwo.set(MyRobot.shooterSpeed)
+                MyRobot.shooterServo.setAngle(90)
+                MyRobot.hopperAgitatorMotor(0.8)
+                done = UtilityFunctions.driveForTime(MyRobot, 0, 4)
+                if done:
+                    MyRobot.shooterMotorOne.set(0)
+                    MyRobot.shooterMotorTwo.set(0)
+                    MyRobot.shooterServo.setAngle(0)
+                    MyRobot.hopperAgitatorMotor(0)
+                    MyRobot.choose_direction_state = "gear_or_cross"
+            
+        if placeGear:
+            if MyRobot.choose_direction_state == "begin" or MyRobot.choose_direction_state == "gear_or_cross":
+                # Use the digital shaft encoder to drive forward enough to get in line with the Lift.
+                done = False
+                done = UtilityFunctions.driveNumInches(self, 0, 1, 0.5) #replace 0 with the distance to drive
+                if done:
+                    MyRobot.choose_direction_state = "turn_to_peg"
+                    
+            elif MyRobot.choose_direction_state == "turn_to_peg":
+                # Use the gyro or camera to rotate to face the Lift
+                done = False
+                # if using a camera, use it to find the goal instead of a gyro
+                if useCamera:
+                    done = UtilityFunctions.findDatGoal(self, self.autoSlowTurnSpeed, "left")
+                else:
+                    done = UtilityFunctions.turnNumDegrees(self, 0) #replace 0 with degrees to turn
+                if done:
+                    MyRobot.choose_direction_state = "score_the_gear"
+                    
+            elif MyRobot.choose_direction_state == "score_the_gear":
+                # Use the digital shaft encoder to drive forward enough to place the gear on the peg
+                done = False
+                done = UtilityFunctions.driveNumInches(self, 0, 1, 0.5) #replace 0 with the distance to the peg
+                if done:
+                    retVal = True
+            
+        # Only Drive Forward to get 5 Points
+        else:
+            if MyRobot.choose_direction_state == "begin" or MyRobot.choose_direction_state == "gear_or_cross":
+                done = False
+                done = UtilityFunctions.driveNumInches(self, 72, 1, 0.5) #Drive 6 feet to cross the Base Line
+                if done:
+                    retVal = True
+                
+        return retVal
