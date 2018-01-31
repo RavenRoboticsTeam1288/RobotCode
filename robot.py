@@ -10,8 +10,8 @@ from networktables import NetworkTable
 from Utilities import UtilityFunctions
 from AutonomousStates import AutoStates
 
-
-#This robot uses Mechanum Drive
+#Raven Robotics 2018 PowerUp
+#This robot uses Tank Drive
 class MyRobot(wpilib.IterativeRobot):
 
     def autonomousInit(self):
