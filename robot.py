@@ -8,7 +8,7 @@ from networktables import NetworkTable
 
 #User Includes
 from Utilities import UtilityFunctions
-#from AutonomousStates import AutoStates
+from AutonomousStates import AutoStates
 
 
 #This robot uses Mechanum Drive
@@ -91,8 +91,11 @@ class MyRobot(wpilib.IterativeRobot):
         self.shooterSpeed = -0.8
             
         #autonomous
-        self.direction = "straight"
-        self.obstacle_type = "moat"
+        self.start_position = "left"
+        self.place_gear = False
+        self.use_camera = False
+        self.shoot = False
+        self.cross_on = "none"
         self.autonomous_state = "begin"
         self.initialTime = 0
         self.initialHeading = 0
@@ -135,11 +138,80 @@ class MyRobot(wpilib.IterativeRobot):
             self.portServo.setAngle(90)
             self.starboardServo.setAngle(90)
             
-            #print("Its in the top")
-            if self.autonomous_state == "begin":
-                done = False
+            
+            if self.autonomous_state == "begin" and self.sd.containsKey("LEFT_CHOICE"):
+                print("LEFT")
+                self.leftBackMotor.set(0)
+                self.leftFrontMotor.set(0)
+                self.rightFrontMotor.set(0)
+                self.rightBackMotor.set(0)
+                #we can either place a gear or only cross the line
+                self.start_position = "left"
+                self.use_camera = False
                 
-                #print("Hello dumbass")
+                auto_mode = self.sd.getValue('LEFT_CHOICE').lower()
+                if auto_mode == "left_place_gear":
+                    self.place_gear = True
+                    print("PLACE LEFT")
+                else:
+                    self.place_gear = False
+                
+                self.autonomous_state = "choose_direction"
+            elif self.autonomous_state =="begin" and self.sd.containsKey("MIDDLE_CHOICE"):
+                self.leftBackMotor.set(0)
+                self.leftFrontMotor.set(0)
+                self.rightFrontMotor.set(0)
+                self.rightBackMotor.set(0)
+                #we may or may not place a gear. We can either do nothing or cross the line on either side
+                self.start_position = "middle"
+                self.use_camera = False
+                
+                auto_mode = self.sd.getValue('MIDDLE_CHOICE').lower()
+                if auto_mode == "middle_place_gear":
+                    self.place_gear = True
+                else:
+                    self.place_gear = False
+                
+                self.autonomous_state = "choose_direction"
+            elif self.autonomous_state == "begin" and self.sd.containsKey("RIGHT_CHOICE"):
+                self.leftBackMotor.set(0)
+                self.leftFrontMotor.set(0)
+                self.rightFrontMotor.set(0)
+                self.rightBackMotor.set(0)
+                #4 options: Shoot and place gear, shoot and cross, only place gear, only cross
+                self.start_position = "right"
+                self.use_camera = False
+                
+                auto_mode = self.sd.getValue('RIGHT_CHOICE').lower()
+                if auto_mode == "right_place_gear":
+                    self.place_gear = True
+                else:
+                    self.place_gear = False
+                self.autonomous_state = "choose_direction"
+                
+            elif self.autonomous_state == "begin":
+                self.leftBackMotor.set(0)
+                self.leftFrontMotor.set(0)
+                self.rightFrontMotor.set(0)
+                self.rightBackMotor.set(0)
+                self.start_position = "left"
+                self.use_camera = False
+                self.place_gear = False
+                self.autonomous_state = "choose_direction"
+                
+                
+            if self.autonomous_state == "choose_direction":
+                done = False
+                if self.start_position == "left":
+                    #print("PRINTING A BUNCH")
+                    done = AutoStates.left(self, self.place_gear, self.use_camera)
+                elif self.start_position == "middle":
+                    done = AutoStates.middle(self, self.place_gear, self.cross_on)
+                elif self.start_position == "right":
+                    done = AutoStates.right(self, self.place_gear, self.use_camera, self.shoot)
+                else:
+                    print("THIS IS THE DEFALULT")
+                    done = AutoStates.left(self, self.place_gear, self.use_camera)
                 
             #################### AUTO TESTING CODE ####################
             
@@ -177,7 +249,7 @@ class MyRobot(wpilib.IterativeRobot):
         pass
 
     def teleopPeriodic(self):
-        #try:
+        try:
             """This function is called periodically during operator control."""
             #self.robotDrive.setSafetyEnabled(True) #IMPORTANT! DO NOT REMOVE!
             
@@ -237,9 +309,9 @@ class MyRobot(wpilib.IterativeRobot):
                 self.climberMotor.set(0)
          
             
-        #except:
-        #    pass
+        except:
+            pass
            
 
-if __name__ == '__main__':
-    wpilib.run(MyRobot)
+print(MyRobot)
+

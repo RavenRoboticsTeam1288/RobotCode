@@ -39,14 +39,14 @@ class UtilityFunctions():
                 robot.autoSafeToGetHeading = True
                 return True
             elif abs(value) <= robot.slower_speed_band:
-                robot.leftFrontMotor.set(1*robot.autoSlowTurnSpeed)
-                robot.leftBackMotor.set(1*robot.autoSlowTurnSpeed)
+                robot.leftFrontMotor.set(-1*robot.autoSlowTurnSpeed)
+                robot.leftBackMotor.set(-1*robot.autoSlowTurnSpeed)
                 robot.rightFrontMotor.set(1*robot.autoSlowTurnSpeed)
                 robot.rightBackMotor.set(1*robot.autoSlowTurnSpeed)
                 return False
             else:
-                robot.leftFrontMotor.set(1*robot.autoNormalTurnSpeed)
-                robot.leftBackMotor.set(1*robot.autoNormalTurnSpeed)
+                robot.leftFrontMotor.set(-1*robot.autoNormalTurnSpeed)
+                robot.leftBackMotor.set(-1*robot.autoNormalTurnSpeed)
                 robot.rightFrontMotor.set(1*robot.autoNormalTurnSpeed)
                 robot.rightBackMotor.set(1*robot.autoNormalTurnSpeed)
                 return False
@@ -59,14 +59,14 @@ class UtilityFunctions():
                 robot.autoSafeToGetHeading = True
                 return True
             elif abs(value) <= robot.slower_speed_band:    
-                robot.leftFrontMotor.set(-1*robot.autoSlowTurnSpeed)
-                robot.leftBackMotor.set(-1*robot.autoSlowTurnSpeed)
+                robot.leftFrontMotor.set(1*robot.autoSlowTurnSpeed)
+                robot.leftBackMotor.set(1*robot.autoSlowTurnSpeed)
                 robot.rightFrontMotor.set(-1*robot.autoSlowTurnSpeed)
                 robot.rightBackMotor.set(-1*robot.autoSlowTurnSpeed)
                 return False
             else:
-                robot.leftFrontMotor.set(-1*robot.autoNormalTurnSpeed)
-                robot.leftBackMotor.set(-1*robot.autoNormalTurnSpeed)
+                robot.leftFrontMotor.set(1*robot.autoNormalTurnSpeed)
+                robot.leftBackMotor.set(1*robot.autoNormalTurnSpeed)
                 robot.rightFrontMotor.set(-1*robot.autoNormalTurnSpeed)
                 robot.rightBackMotor.set(-1*robot.autoNormalTurnSpeed)
                 return False
@@ -138,6 +138,7 @@ class UtilityFunctions():
             robot.rightFrontMotor.set(direction * speed)
             robot.rightBackMotor.set(direction * speed)
             robot.autoSafeToResetEncoder = False
+            print("DRIVING NUM INCHES")
             return False
         else:
             #reached the end, stop and return true (STOP)
@@ -146,6 +147,7 @@ class UtilityFunctions():
             robot.rightFrontMotor.set(0)
             robot.rightBackMotor.set(0)
             robot.autoSafeToResetEncoder = True
+            print("FINISHED DRIVE NUM INCHES")
             return True
             
     #Use the values from networkTables from the camera to determine which direction to turn the robot to align
