@@ -34,30 +34,21 @@ class MyRobot(wpilib.IterativeRobot):
         self.game_pad = wpilib.Joystick(3)
         
         # Drive Train Motors
-        self.leftFrontMotor = wpilib.VictorSP(0) #front left 
+        self.leftFrontMotor = wpilib.TalonSRX(0) #front left 
         self.leftBackMotor = wpilib.VictorSP(1) #back left 
         self.rightFrontMotor = wpilib.VictorSP(2) #front right 
-        self.rightBackMotor = wpilib.VictorSP(3) #back right
+        self.rightBackMotor = wpilib.TalonSRX(3) #back right
         
         # Shooter Motors
-        self.shooterMotorOne = wpilib.VictorSP(4)
-        self.shooterMotorTwo = wpilib.VictorSP(5)
-        
-        # Climber Motor(s)
-        self.climberMotor = wpilib.VictorSP(6)
-        
-        # Hopper Agitator motor(s)
-        self.hopperAgitatorMotor = wpilib.VictorSP(7)
+        #Front is front of shooter
+        self.shooterLeftFront = wpilib.TalonSRX(4)
+        self.shooterLeftBack = wpilib.TalonSRX(5)
+        self.shooterRightFront = wpilib.TalonSRX(6)
+        self.shooterRightBack = wpilib.TalonSRX(7)
         
         # Conveyor Motor(s)
-        self.conveyorMotor = wpilib.VictorSP(8)
-        
-        # Gear Box Servos. Connected on the extension board
-        self.portServo = wpilib.Servo(10) #Looking from inside the robot towards the front, this is the left servo
-        self.starboardServo = wpilib.Servo(11) #Looking from inside the robot towards the front, this is the right servo
-        
-        # Shooter Servo. Connected on the extension board
-        self.shooterServo = wpilib.Servo(12)
+        #TO BE EDITED
+        self.conveyorMotor = wpilib.TalonSRX(8)
         
         
         #robot drive
@@ -88,13 +79,11 @@ class MyRobot(wpilib.IterativeRobot):
         self.startTime = 0
         
         #shooter speed variable
+        '''TO BE EDITED'''
         self.shooterSpeed = -0.8
             
         #autonomous
         self.start_position = "left"
-        self.place_gear = False
-        self.use_camera = False
-        self.shoot = False
         self.cross_on = "none"
         self.autonomous_state = "begin"
         self.initialTime = 0
@@ -110,110 +99,18 @@ class MyRobot(wpilib.IterativeRobot):
         self.autoNormalTurnSpeed = 0.6 #normal speed
         
         #AutoStates variables
+        '''
         self.choose_direction_state = "begin"
         self.handle_obstacle_state = "begin"
         self.shooting_state = "begin"
-        
-        #Utilities variables
-        self.goalSafeToGetTime = True
-        self.goalInitialTimeStamp = 0   #use to store an initial timestamp
-        self.imageSearchRate = 5 #how many times to query for an updated network table a second
-        self.noGoalFoundCount = 0 #How many times we have been searched without having a goal
-        self.lastCOG_X = 0
-        self.lastCOG_Y = 0
-        
-        
-        self.ERROR = 0
-        self.GO_LEFT = 1
-        self.GO_RIGHT = 2
-        self.ON_TARGET = 3
-        
+        '''
         
     def autonomousPeriodic(self):
         #try:
             """This function is called periodically during autonomous."""
             self.robotDrive.setSafetyEnabled(False) #IMPORTANT! DO NOT REMOVE
             
-            # At beginning of autonomous, release the gear ramps
-            self.portServo.setAngle(90)
-            self.starboardServo.setAngle(90)
-            
-            
-            if self.autonomous_state == "begin" and self.sd.containsKey("LEFT_CHOICE"):
-                print("LEFT")
-                self.leftBackMotor.set(0)
-                self.leftFrontMotor.set(0)
-                self.rightFrontMotor.set(0)
-                self.rightBackMotor.set(0)
-                #we can either place a gear or only cross the line
-                self.start_position = "left"
-                self.use_camera = False
-                
-                auto_mode = self.sd.getValue('LEFT_CHOICE').lower()
-                if auto_mode == "left_place_gear":
-                    self.place_gear = True
-                    print("PLACE LEFT")
-                else:
-                    self.place_gear = False
-                
-                self.autonomous_state = "choose_direction"
-            elif self.autonomous_state =="begin" and self.sd.containsKey("MIDDLE_CHOICE"):
-                self.leftBackMotor.set(0)
-                self.leftFrontMotor.set(0)
-                self.rightFrontMotor.set(0)
-                self.rightBackMotor.set(0)
-                #we may or may not place a gear. We can either do nothing or cross the line on either side
-                self.start_position = "middle"
-                self.use_camera = False
-                
-                auto_mode = self.sd.getValue('MIDDLE_CHOICE').lower()
-                if auto_mode == "middle_place_gear":
-                    self.place_gear = True
-                else:
-                    self.place_gear = False
-                
-                self.autonomous_state = "choose_direction"
-            elif self.autonomous_state == "begin" and self.sd.containsKey("RIGHT_CHOICE"):
-                self.leftBackMotor.set(0)
-                self.leftFrontMotor.set(0)
-                self.rightFrontMotor.set(0)
-                self.rightBackMotor.set(0)
-                #4 options: Shoot and place gear, shoot and cross, only place gear, only cross
-                self.start_position = "right"
-                self.use_camera = False
-                
-                auto_mode = self.sd.getValue('RIGHT_CHOICE').lower()
-                if auto_mode == "right_place_gear":
-                    self.place_gear = True
-                else:
-                    self.place_gear = False
-                self.autonomous_state = "choose_direction"
-                
-            elif self.autonomous_state == "begin":
-                self.leftBackMotor.set(0)
-                self.leftFrontMotor.set(0)
-                self.rightFrontMotor.set(0)
-                self.rightBackMotor.set(0)
-                self.start_position = "left"
-                self.use_camera = False
-                self.place_gear = False
-                self.autonomous_state = "choose_direction"
-                
-                
-            if self.autonomous_state == "choose_direction":
-                done = False
-                if self.start_position == "left":
-                    #print("PRINTING A BUNCH")
-                    done = AutoStates.left(self, self.place_gear, self.use_camera)
-                elif self.start_position == "middle":
-                    done = AutoStates.middle(self, self.place_gear, self.cross_on)
-                elif self.start_position == "right":
-                    done = AutoStates.right(self, self.place_gear, self.use_camera, self.shoot)
-                else:
-                    print("THIS IS THE DEFALULT")
-                    done = AutoStates.left(self, self.place_gear, self.use_camera)
-                
-            #################### AUTO TESTING CODE ####################
+                        #################### AUTO TESTING CODE ####################
             
             # Test Encoder
                 # Drive for 24 inches
@@ -253,57 +150,53 @@ class MyRobot(wpilib.IterativeRobot):
             """This function is called periodically during operator control."""
             #self.robotDrive.setSafetyEnabled(True) #IMPORTANT! DO NOT REMOVE!
             
-            stick1_X = self.stick1.getX()#left
+            stick1_Y = self.stick1.getY()#left
             stick2_Y = self.stick2.getY()#right
-            stick2_X = self.stick2.getX()#right
             
             """ dead-band """
-            if stick1_X > -0.05 and stick1_X < 0.05:
-                stick1_X = 0
+            if stick1_Y > -0.05 and stick1_Y < 0.05:
+                stick1_Y = 0
             if stick2_Y > -0.05 and stick2_Y < 0.05:
                 stick2_Y = 0
-            if stick2_X > -0.05 and stick2_X < 0.05:
-                stick2_X = 0
            
         
-            # Use the joystick X axis for lateral movement, Y axis for forward movement, and stick 2 X axis for rotation.
-            # This sample does not use field-oriented drive, so the gyro input is set to zero.
-            self.robotDrive.mecanumDrive_Cartesian(-stick2_X,
-                                                   stick2_Y,
-                                                   stick1_X, 0)
+            # Use the Stick 1 joystick Y axis for the right wheels, and the Stick 2 Y axis for the left wheels.
+            self.robotDrive.tankDrive(stick1_Y, stick2_Y)
                                                    
-            
-               
             # Other Controls Below
             
             # Shooter Controls:
             
             # SHOOT!
-            if self.game_pad.getRawButton(8) or self.stick2.getRawButton(1):
-                self.shooterServo.setAngle(90)
-                self.hopperAgitatorMotor.set(0.8)
+            if self.game_pad.getRawButton(8):
+                self.
+                self.
             else:
-                self.shooterServo.setAngle(0)
-                self.hopperAgitatorMotor.set(0)
+                self.
+                self.
             
             # Spin up shooter
-            if self.game_pad.getRawButton(7) or self.stick1.getRawButton(1):
-                self.shooterMotorOne.set(self.shooterSpeed)
-                self.shooterMotorTwo.set(self.shooterSpeed)
+            if self.game_pad.getRawButton(7):
+                self.shooterLeftFront.set(self.shooterSpeed)
+                self.shooterLeftBack.set(self.shooterSpeed)
+                self.shooterRightFront.set(self.shooterSpeed)
+                self.shooterRightBack.set(self.shooterSpeed)
             else:
-                self.shooterMotorOne.set(0)
-                self.shooterMotorTwo.set(0)
+                self.shooterLeftFront.set(0)
+                self.shooterLeftBack.set(0)
+                self.shooterRightFront.set(0)
+                self.shoterRightBack.set(0)
             
             # Conveyor Controls:
-            if self.game_pad.getRawButton(6) or self.stick1.getRawButton(3):
-                self.conveyorMotor.set(1)      
-            elif self.game_pad.getRawButton(3) or self.stick1.getRawButton(2):
+            if self.game_pad.getRawButton(6):
+                self.conveyorMotor.set(1)
+            elif self.game_pad.getRawButton(3):
                 self.conveyorMotor.set(-0.6)
             else:
                 self.conveyorMotor.set(0)
             
             # Climbing Controls
-            if self.game_pad.getRawButton(4) or self.stick2.getRawButton(3):
+            if self.game_pad.getRawButton(4):
                 self.climberMotor.set(-1)
             else:
                 self.climberMotor.set(0)
