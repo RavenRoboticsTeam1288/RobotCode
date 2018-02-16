@@ -11,7 +11,7 @@ from Utilities import UtilityFunctions
 
 class AutoStates():
     
-    def findDatGoal(MyRobot, turnSpeed, defaultDirection = "right"):
+    '''def findDatGoal(MyRobot, turnSpeed, defaultDirection = "right"):
         retVal = False
         direction = UtilityFunctions.getDirectionToGoal(MyRobot)
         print("finding dat goal")
@@ -153,7 +153,7 @@ class AutoStates():
                 retVal = True
                 
         return retVal
-            
+
     def right(MyRobot, placeGear, useCamera, shoot):
         retVal = False
         # Hopefully do some math to figure out how to place a gear using a Shaft encoder and a Gyro or Camera
@@ -217,4 +217,81 @@ class AutoStates():
                     MyRobot.choose_direction_state = "done"
                     retVal = True
                 
-        return retVal
+        return retVal'''
+
+    def driveForward(MyRobot):
+        done = UtilityFunctions.driveNumInches(MyRobot, 120, 1, 1)
+        if done:
+            return True
+
+
+    def swSameSide(MyRobot, side):
+        if side == 'left':
+            direction = -1
+        elif side == 'right':
+            direction = 1
+
+        
+        if autoState == 'begin':
+            done = UtilityFunctions.driveNumInches(MyRobot, 145.5, 1, 1)
+            if done:
+                autoState = 'turn'
+
+        elif autoState == 'turn':
+            done = UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
+            if done:
+                autoState = 'back_up'
+
+        elif autoState == 'back_up':
+            done = UtilityFunctions.driveNumInches(MyRobot, 24, -1, 1)
+            if done:
+                autoState = 'shoot'
+
+        elif autoState == 'shoot':
+            done = UtilityFunctions.shootSwitch(MyRobot)
+            if done:
+                autoState = 'Done'
+
+        elif autoState == 'Done':
+            return True
+
+    #side argument is our starting position
+    def swCrossSide(MyRobot, side):
+        if side == 'left':
+            direction = 1
+        elif side == 'right':
+            direction = -1
+
+        if autoState == 'begin':
+            done = UtilityFunctions.driveNumInches(MyRobot, 40, 1, 1)
+            if done:
+                autoState = 'turn_right'
+
+        elif autoState == 'turn_first':
+            done = UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
+            if done:
+                autoState = 'cross'
+
+        elif autoState == 'cross':
+            done = UtilityFunctions.driveNumInches(MyRobot, 300, 1, 1)
+            if done:
+                autoState = 'turn_second'
+
+        elif autoState == 'turn_second':
+            done UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
+            if done:
+                autoState = 'back_up'
+
+        elif autoState == 'back_up':
+            done = UtilityFunctions.driveNumInches(MyRobot, 24, -1, 1)
+            if done:
+                autoState = 'shoot'
+
+        elif autoState == 'shoot':
+            done = UtilityFunctions.shootSwitch(MyRobot)
+            if done:
+                autoState = 'Done'
+
+        elif autoState == 'Done':
+            return True
+        

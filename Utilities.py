@@ -131,7 +131,7 @@ class UtilityFunctions():
     # Direction will either be 1 (FORWARD) or -1 (REVERSE)
     def driveNumInches(robot, num, direction, speed):
         UtilityFunctions.resetEncoderValue(robot, robot.encoder, robot.autoSafeToResetEncoder)
-        inches_distance = abs(robot.encoder.get()) * .0267 # (100 ticks ~ 2.67 inches)
+        inches_distance = abs(robot.encoder.get())# * .0267 # (100 ticks ~ 2.67 inches)
         #print(abs(robot.encoder.get()))
         if inches_distance < num:
             #not there yet, keep going and return false (FORWARD)
@@ -223,5 +223,34 @@ class UtilityFunctions():
             robot.rightFrontMotor.set(0)
             done = True
         return done
-        
-    
+
+    def waitForTime(robot, num):
+        done = False
+        robot.initialTime = UtilityFunctions.getAnInitialTimeStamp(robot, robot.initialTime, robot.autoSafeToGetTime)
+        time = robot.timer.getMsClock() / 1000
+        if time - initTime < num:
+            return False
+        else:
+            return True
+
+    def shootSwitch(robot):
+        done = False
+        robot.shooterLeftFront.set(robot.slowShootSpeed)
+        robot.shooterLeftBack.set(robot.slowShootSpeed)
+        robot.shooterRightFront.set(robot.slowShootSpeed)
+        robot.shooterRightBack.set(robot.slowShootSpeed)
+        doneSpinning = waitForTime(robot, 2)
+        if doneSpinning:
+            robot.shooterDoor.set(2)
+            doneShooting = waitForTime(robot, 2)
+            if doneShooting:
+                robot.shooterLeftFront.set(0)
+                robot.shooterLeftBack.set(0)
+                robot.shooterRightFront.set(0)
+                robot.shooterRightBack.set(0)
+                return True
+            else:
+                return False
+        else:
+            return False
+            

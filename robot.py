@@ -37,6 +37,8 @@ class MyRobot(wpilib.IterativeRobot):
                 self.scalePos = 'left'
             elif self.goalPos[1] == 'R':
                 self.scalePos = 'right'
+
+        self.shooterDoor.set(1)
         
     
     def robotInit(self):
@@ -98,7 +100,7 @@ class MyRobot(wpilib.IterativeRobot):
         #
         ## you may need to change or remove this to match your robot
         self.robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, True)
-        self.robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, True) 
+        self.robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, True) 
         
         # Sensors
         
@@ -133,11 +135,11 @@ class MyRobot(wpilib.IterativeRobot):
         self.autoNormalTurnSpeed = 0.6 #normal speed
         
         #AutoStates variables
-        '''
-        self.choose_direction_state = "begin"
-        self.handle_obstacle_state = "begin"
-        self.shooting_state = "begin"
-        '''
+        
+        self.autoState = "begin"
+        #self.handle_obstacle_state = "begin"
+        self.shootState = "begin"
+        
         #Possible values are:
         #startPos = left, center, right
         #autoTarget = switch, scale, line
@@ -153,7 +155,7 @@ class MyRobot(wpilib.IterativeRobot):
             
             # Test Encoder
                 # Drive for 24 inches
-                #done = UtilityFunctions.driveNumInches(self, 32, 1, 0.3)
+            done = UtilityFunctions.driveNumInches(self, 500, 1, 0.3)
             # Test Gyro
                 # Turn 90 Degrees Right
                 #done = UtilityFunctions.turnNumDegrees(self, 90)
@@ -162,136 +164,138 @@ class MyRobot(wpilib.IterativeRobot):
                 #AutoStates.findDatGoal(self, 0.3, "none")
             #################### END AUTO TESTING #####################
             
-            '''if done:
-                self.autonomous_state = "done"
+            if done:
+                self.autoState = "done"
                 self.leftBackMotor.set(0)
                 self.leftFrontMotor.set(0)
                 self.rightBackMotor.set(0)
-                self.rightFrontMotor.set(0)'''
+                self.rightFrontMotor.set(0)
 
-            #Starting Left
-            if self.startPos == 'left':
-                
-                #Goal Switch
-                if self.autoTarget == 'switch':
-                    if self.switchPos == 'left':
-                        #Insert swLL
-                        pass
-                    elif self.switchPos == 'right':
-                        #InsertswLR
-                        pass
-                    else:
-                        #Drive Forward
-                        pass
-
-                #Goal Scale
-                elif self.autoTarget == 'scale':
-                    if self.scalePos == 'left':
-                        #Insert scLL
-                        pass
-                    elif self.scalePos == 'right':
-                        #Insert scLR
-                        pass
-                    else:
-                        #Drive Forward
-                        pass
-
-                #No Goal
-                else:
-                    if self.switchPos == 'left':
-                        #Insert swLL
-                        pass
-                    elif self.switchPos == 'right':
-                        #Insert swLR
-                        pass
-                    else:
-                        #Drive Forward
-                        pass
-
-
-            #Starting Right
-            elif self.startPos == 'right':
-
-                #Goal Switch
-                if self.autoTarget == 'switch':
-                    if self.switchPos == 'left':
-                        #Insert swRL
-                        pass
-                    elif self.switchPos == 'right':
-                        #InsertswRR
-                        pass
-                    else:
-                        #Drive Forward
-                        pass
-
-                #Goal Scale
-                elif self.autoTarget == 'scale':
-                    if self.scalePos == 'left':
-                        #Insert scRL
-                        pass
-                    elif self.scalePos == 'right':
-                        #Insert scRR
-                        pass
-                    else:
-                        #Drive Forward
-                        pass
-
-                #No Goal
-                else:
-                    if self.switchPos == 'left':
-                        #Insert swRL
-                        pass
-                    elif self.switchPos == 'right':
-                        #Insert swRR
-                        pass
-                    else:
-                        #Drive Forward
-                        pass
-
-
-            #Start Center
-            elif self.startPos == 'center':
-
-                #Goal Switch
-                if self.autoTarget == 'switch':
-                    if self.switchPos == 'left':
-                        #Insert swCL
-                        pass
-                    elif self.switchPos == 'right':
-                        #InsertswCR
-                        pass
-                    else:
-                        #Drive Forward
-                        pass
-
-                #Goal Scale
-                elif self.autoTarget == 'scale':
-                    if self.scalePos == 'left':
-                        #Insert scCL
-                        pass
-                    elif self.scalePos == 'right':
-                        #Insert scCR
-                        pass
-                    else:
-                        #Drive Forward
-                        pass
-
-                #No Goal
-                else:
-                    if self.switchPos == 'left':
-                        #Insert swCL
-                        pass
-                    elif self.switchPos == 'right':
-                        #Insert swCR
-                        pass
-                    else:
-                        #Cross Field
-                        pass
-
-            #No Starting Position
             else:
-                #Drive Forward
-                pass
+
+                #Starting Left
+                if self.startPos == 'left':
+                
+                    #Goal Switch
+                    if self.autoTarget == 'switch':
+                        if self.switchPos == 'left':
+                            done = swSameSide(self, left)
+                            pass
+                        elif self.switchPos == 'right':
+                            #InsertswLR
+                            pass
+                        else:
+                            #Drive Forward
+                            pass
+
+                    #Goal Scale
+                    elif self.autoTarget == 'scale':
+                        if self.scalePos == 'left':
+                            #Insert scLL
+                            pass
+                        elif self.scalePos == 'right':
+                            #Insert scLR
+                            pass
+                        else:
+                            #Drive Forward
+                            pass
+
+                    #No Goal
+                    else:
+                        if self.switchPos == 'left':
+                            #Insert swLL
+                            pass
+                        elif self.switchPos == 'right':
+                            #Insert swLR
+                            pass
+                        else:
+                            #Drive Forward
+                            pass
+
+
+                #Starting Right
+                elif self.startPos == 'right':
+
+                    #Goal Switch
+                    if self.autoTarget == 'switch':
+                        if self.switchPos == 'left':
+                            #Insert swRL
+                            pass
+                        elif self.switchPos == 'right':
+                            #InsertswRR
+                            pass
+                        else:
+                            #Drive Forward
+                            pass
+
+                    #Goal Scale
+                    elif self.autoTarget == 'scale':
+                        if self.scalePos == 'left':
+                            #Insert scRL
+                            pass
+                        elif self.scalePos == 'right':
+                            #Insert scRR
+                            pass
+                        else:
+                            #Drive Forward
+                            pass
+
+                    #No Goal
+                    else:
+                        if self.switchPos == 'left':
+                            #Insert swRL
+                            pass
+                        elif self.switchPos == 'right':
+                            #Insert swRR
+                            pass
+                        else:
+                            #Drive Forward
+                            pass
+
+
+                #Start Center
+                elif self.startPos == 'center':
+
+                    #Goal Switch
+                    if self.autoTarget == 'switch':
+                        if self.switchPos == 'left':
+                            #Insert swCL
+                            pass
+                        elif self.switchPos == 'right':
+                            #InsertswCR
+                            pass
+                        else:
+                            #Drive Forward
+                            pass
+
+                    #Goal Scale
+                    elif self.autoTarget == 'scale':
+                        if self.scalePos == 'left':
+                            #Insert scCL
+                            pass
+                        elif self.scalePos == 'right':
+                            #Insert scCR
+                            pass
+                        else:
+                            #Drive Forward
+                            pass
+
+                    #No Goal
+                    else:
+                        if self.switchPos == 'left':
+                            #Insert swCL
+                            pass
+                        elif self.switchPos == 'right':
+                            #Insert swCR
+                            pass
+                        else:
+                            #Cross Field
+                            pass
+
+                #No Starting Position
+                else:
+                    #Drive Forward
+                    pass
                     
             
         #except:
