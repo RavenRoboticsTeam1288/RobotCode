@@ -54,8 +54,8 @@ class MyRobot(wpilib.IterativeRobot):
         self.encoder = wpilib.Counter(1)
 
         # Joysticks
-        self.stick1 = wpilib.Joystick(2)#left
-        self.stick2 = wpilib.Joystick(1)#right
+        self.stick1 = wpilib.Joystick(2)#right
+        self.stick2 = wpilib.Joystick(1)#left
         self.game_pad = wpilib.Joystick(3)
         
         # Drive Train Motors
@@ -66,15 +66,14 @@ class MyRobot(wpilib.IterativeRobot):
         
         # Shooter Motors
         #Front is front of shooter
-        self.shooterLeftFront = wpilib.Talon(4)
-        self.shooterLeftBack = wpilib.Talon(5)
-        self.shooterRightFront = wpilib.Talon(6)
-        self.shooterRightBack = wpilib.Talon(7)
+        self.shooterLeftFront = wpilib.Talon(6)
+        self.shooterLeftBack = wpilib.Talon(7)
+        self.shooterRightFront = wpilib.Talon(8)
+        self.shooterRightBack = wpilib.Talon(9)
         
         # Intake Arm Motors
-        '''TO BE EDITED'''
-        self.intakeMotorRight = wpilib.Talon(8)
-        self.intakeMotorLeft = wpilib.Talon(9)
+        self.intakeMotorRight = wpilib.Talon(4)
+        self.intakeMotorLeft = wpilib.Talon(5)
 
         #Climbing Solenoids
         #Second Argument is forward channel; Third Argument is backward channel
@@ -163,6 +162,13 @@ class MyRobot(wpilib.IterativeRobot):
                 # Follow a target
                 #AutoStates.findDatGoal(self, 0.3, "none")
             #################### END AUTO TESTING #####################
+
+            #Autonomous Delay:
+            #wait = UtilityFunctions.waitForTime(self, 5)
+            
+            #done = False
+            if self.autoState == "done":
+                done = True
             
             if done:
                 self.autoState = "done"
@@ -170,6 +176,11 @@ class MyRobot(wpilib.IterativeRobot):
                 self.leftFrontMotor.set(0)
                 self.rightBackMotor.set(0)
                 self.rightFrontMotor.set(0)
+
+                self.shooterLeftFront.set(0)
+                self.shooterLeftBack.set(0)
+                self.shooterRightFront.set(0)
+                self.shooterRightBack.set(0)
 
             else:
 
@@ -179,14 +190,11 @@ class MyRobot(wpilib.IterativeRobot):
                     #Goal Switch
                     if self.autoTarget == 'switch':
                         if self.switchPos == 'left':
-                            done = swSameSide(self, left)
-                            pass
+                            done = AutoStates.swSameSide(self, 'left')
                         elif self.switchPos == 'right':
-                            #InsertswLR
-                            pass
+                            done = AutoStates.swCrossSide(self, 'left')
                         else:
-                            #Drive Forward
-                            pass
+                            done = AutoStates.driveForward(self)
 
                     #Goal Scale
                     elif self.autoTarget == 'scale':
@@ -203,14 +211,11 @@ class MyRobot(wpilib.IterativeRobot):
                     #No Goal
                     else:
                         if self.switchPos == 'left':
-                            #Insert swLL
-                            pass
+                            done = AutoStates.swSameSide(self, 'left')
                         elif self.switchPos == 'right':
-                            #Insert swLR
-                            pass
+                            done = AutoStates.swCrossSide(self, 'left')
                         else:
-                            #Drive Forward
-                            pass
+                            done = AutoStates.driveForward(self)
 
 
                 #Starting Right
@@ -219,14 +224,11 @@ class MyRobot(wpilib.IterativeRobot):
                     #Goal Switch
                     if self.autoTarget == 'switch':
                         if self.switchPos == 'left':
-                            #Insert swRL
-                            pass
+                            done = AutoStates.swCrossSide(self, 'right')
                         elif self.switchPos == 'right':
-                            #InsertswRR
-                            pass
+                            done = AutoStates.swSameSide(self, 'right')
                         else:
-                            #Drive Forward
-                            pass
+                            done = AutoStates.driveForward(self)
 
                     #Goal Scale
                     elif self.autoTarget == 'scale':
@@ -243,14 +245,11 @@ class MyRobot(wpilib.IterativeRobot):
                     #No Goal
                     else:
                         if self.switchPos == 'left':
-                            #Insert swRL
-                            pass
+                            done = AutoStates.swCrossSide(self, 'right')
                         elif self.switchPos == 'right':
-                            #Insert swRR
-                            pass
+                            done = AutoStates.swCrossSide(self, 'right')
                         else:
-                            #Drive Forward
-                            pass
+                            done = AutoStates.driveForward(self)
 
 
                 #Start Center
@@ -259,14 +258,11 @@ class MyRobot(wpilib.IterativeRobot):
                     #Goal Switch
                     if self.autoTarget == 'switch':
                         if self.switchPos == 'left':
-                            #Insert swCL
-                            pass
+                            done = AutoStates.swMiddle(self, 'left')
                         elif self.switchPos == 'right':
-                            #InsertswCR
-                            pass
+                            done = AutoStates.swMiddle(self, 'right')
                         else:
-                            #Drive Forward
-                            pass
+                            done = AutoStates.driveForward(self)
 
                     #Goal Scale
                     elif self.autoTarget == 'scale':
@@ -283,19 +279,18 @@ class MyRobot(wpilib.IterativeRobot):
                     #No Goal
                     else:
                         if self.switchPos == 'left':
-                            #Insert swCL
-                            pass
+                            done = AutoStates.swMiddle(self, 'left')
                         elif self.switchPos == 'right':
-                            #Insert swCR
-                            pass
+                            done = AutoStates.swMiddle(self, 'right')
                         else:
-                            #Cross Field
-                            pass
+                            done = AutoStates.driveForward(self)
 
                 #No Starting Position
                 else:
-                    #Drive Forward
-                    pass
+                    done = AutoStates.driveForward(self)
+                    
+            if done:
+                self.autoState = "done"
                     
             
         #except:
@@ -334,29 +329,38 @@ class MyRobot(wpilib.IterativeRobot):
             # Other Controls Below
             
             # Shooter Controls:
-            
+
             # SHOOT!
+            
             #Forward
             if self.game_pad.getRawButton(8):
                 self.shooterDoor.set(1)
+            
             #Backward
             elif self.game_pad.getRawButton(7):
                 self.shooterDoor.set(2)
 
+
             #Elevate Shooter
+                
             #Up
             if self.game_pad.getRawButton(5):
                 self.shooterElev.set(1)
+            
             #Down
             if self.game_pad.getRawButton(2):
                 self.shooterElev.set(2)
+
+            
             # Spin up shooter
+            
             #Fast
             if self.game_pad.getRawButton(6):
                 self.shooterLeftFront.set(self.fastShootSpeed)
                 self.shooterLeftBack.set(self.fastShootSpeed)
                 self.shooterRightFront.set(-self.fastShootSpeed)
                 self.shooterRightBack.set(-self.fastShootSpeed)
+
             #Slow
             elif self.game_pad.getRawButton(3):
                 self.shooterLeftFront.set(self.slowShootSpeed)
@@ -369,6 +373,7 @@ class MyRobot(wpilib.IterativeRobot):
                 self.shooterRightFront.set(0)
                 self.shooterRightBack.set(0)
 
+
             # Intake Arm Controls
             if self.stick2.getRawButton(1):
                 self.intakeMotorLeft.set(1)
@@ -376,9 +381,10 @@ class MyRobot(wpilib.IterativeRobot):
             elif self.stick1.getRawButton(1):
                 self.intakeMotorLeft.set(-1)
                 self.intakeMotorRight.set(1)
-            elif self.stick1.getRawButton(2):
+            elif self.stick2.getRawButton(3):
                 self.intakeMotorLeft.set(0)
                 self.intakeMotorRight.set(0)
+
             
             # Climbing Controls
             climbTggl = False

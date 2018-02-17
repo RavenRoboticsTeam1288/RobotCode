@@ -225,7 +225,23 @@ class AutoStates():
             return True
 
 
+    def straightBack(MyRobot):
+
+        if MyRobot.autoState == 'begin':
+            done = UtilityFunctions.driveNumInches(MyRobot, 168, -1, 1)
+            if done:
+                MyRobot.autoState = 'shoot'
+
+        elif MyRobot.autoState == 'shoot':
+            done = UtilityFunctions.shootSwitch(MyRobot)
+            if done:
+                MyRobot.autoState = 'Done'
+
+        elif MyRobot.autoState == 'Done':
+            return True
+
     def swSameSide(MyRobot, side):
+        direction = 1
         if side == 'left':
             direction = -1
         elif side == 'right':
@@ -255,43 +271,86 @@ class AutoStates():
         elif autoState == 'Done':
             return True
 
-    #side argument is our starting position
+    #Side argument is our starting position
     def swCrossSide(MyRobot, side):
+        direction = 1
         if side == 'left':
             direction = 1
         elif side == 'right':
             direction = -1
 
-        if autoState == 'begin':
+        if MyRobot.autoState == 'begin':
             done = UtilityFunctions.driveNumInches(MyRobot, 40, 1, 1)
             if done:
-                autoState = 'turn_right'
+                MyRobot.autoState = 'turn_right'
 
-        elif autoState == 'turn_first':
+        elif MyRobot.autoState == 'turn_first':
             done = UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
             if done:
-                autoState = 'cross'
+                MyRobot.autoState = 'cross'
 
-        elif autoState == 'cross':
+        elif MyRobot.autoState == 'cross':
             done = UtilityFunctions.driveNumInches(MyRobot, 300, 1, 1)
             if done:
-                autoState = 'turn_second'
+                MyRobot.autoState = 'turn_second'
 
-        elif autoState == 'turn_second':
-            done UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
+        elif MyRobot.autoState == 'turn_second':
+            done = UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
             if done:
-                autoState = 'back_up'
+                MyRobot.autoState = 'back_up'
 
-        elif autoState == 'back_up':
+        elif MyRobot.autoState == 'back_up':
             done = UtilityFunctions.driveNumInches(MyRobot, 24, -1, 1)
             if done:
-                autoState = 'shoot'
+                MyRobot.autoState = 'shoot'
 
-        elif autoState == 'shoot':
+        elif MyRobot.autoState == 'shoot':
             done = UtilityFunctions.shootSwitch(MyRobot)
             if done:
-                autoState = 'Done'
+                MyRobot.autoState = 'Done'
 
-        elif autoState == 'Done':
+        elif MyRobot.autoState == 'Done':
             return True
-        
+
+
+    #Side argument is goal side
+    def swMiddle(MyRobot, side):
+        direction = 1
+        if side == 'left':
+            direction = -1
+        elif side == 'right':
+            direction = 1
+
+
+        if MyRobot.autoState == 'begin':
+            done = UtilityFunctions.driveNumInches(MyRobot, 40, 1, 1)
+            if done:
+                MyRobot.autoState = 'turn_first'
+
+        elif MyRobot.autoState == 'turn_first':
+            done = UtilityFunctions.turnNumInches(MyRobot, 90*direction)
+            if done:
+                MyRobot.autoState = 'cross'
+
+        elif MyRobot.autoState == 'cross':
+            done = UtilityFunctions.driveNumInches(MyRobot, '''Insert Distance''', 1, 1)
+            if done:
+                MyRobot.autoState = 'turn_second'
+
+        elif MyRobot.autoState == 'turn_second':
+            done = UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
+            if done:
+                MyRobot.autoState = 'back_up'
+
+        elif MyRobot.autoState == 'back_up':
+            done = UtilityFunctions.driveNumInches(MyRobot, '''Insert Distance''', -1, 1)
+            if done:
+                MyRobot.autoState = 'shoot'
+
+        elif MyRobot.autoState == 'shoot':
+            done = UtilityFunctions.shootSwitch(MyRobot)
+            if done:
+                MyRobot.autoState = 'Done'
+
+        elif MyRobot.autoState == 'Done':
+            return True
