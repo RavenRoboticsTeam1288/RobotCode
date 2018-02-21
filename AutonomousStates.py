@@ -333,7 +333,87 @@ class AutoStates():
                 MyRobot.autoState = 'cross'
 
         elif MyRobot.autoState == 'cross':
-            done = UtilityFunctions.driveNumInches(MyRobot, '''Insert Distance''', 1, 1)
+            done = UtilityFunctions.driveNumInches(MyRobot, 54, 1, 1)
+            if done:
+                MyRobot.autoState = 'turn_second'
+
+        elif MyRobot.autoState == 'turn_second':
+            done = UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
+            if done:
+                MyRobot.autoState = 'back_up'
+
+        elif MyRobot.autoState == 'back_up':
+            done = UtilityFunctions.driveNumInches(MyRobot, 81, -1, 1)
+            if done:
+                MyRobot.autoState = 'shoot'
+
+        elif MyRobot.autoState == 'shoot':
+            done = UtilityFunctions.shootSwitch(MyRobot)
+            if done:
+                MyRobot.autoState = 'Done'
+
+        elif MyRobot.autoState == 'Done':
+            return True
+
+
+    def scSameSide(MyRobot, side):
+
+        if side == 'left':
+            direction = -1
+        elif side == 'right':
+            direction = 1
+
+
+        if MyRobot.autoState == 'begin':
+            done = UtilityFunctions.driveNumInches(MyRobot, 304, 1, 1)
+            if done:
+                MyRobot.autoState = 'turn'
+
+        elif MyRobot.autoState == 'turn':
+            done = UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
+            if done:
+                MyRobot.autoState = 'back_up'
+
+        elif MyRobot.autoState == 'back_up':
+            done = UtilityFunctions.driveNumInches(MyRobot, '''Insert Distance''', -1, 1)
+            if done:
+                MyRobot.autoState = 'raise_shooter'
+
+        elif MyRobot.autoState == 'raise_shooter':
+            done = MyRobot.shooterElev.set(1)
+            if done:
+                MyRobot.autoState = 'shoot'
+
+        elif MyRobot.autoState == 'shoot':
+            done = UtilityFunctions.shootScale(MyRobot)
+            if done:
+                MyRobot.autoState = 'Done'
+
+        elif MyRobot.autoState == 'Done':
+            return True
+
+
+    #Side argument is starting position
+    def scCrossSide(MyRobot, side):
+
+        if side == 'left':
+            direction = 1
+        elif side == 'right':
+            direction = -1
+
+
+        if MyRobot.autoState == 'begin':
+            done = UtilityFunctions.driveNumInches(MyRobot, 246, 1, 1)
+            if done:
+                MyRobot.autoState = 'turn_first'
+
+        elif MyRobot.autoState == 'turn_first':
+            done = UtilityFunctions.turnNumDegrees(MyRobot, 90*Direction)
+            if done:
+                MyRobot.autoState = 'cross'
+
+        elif MyRobot.autoState == 'cross':
+            done = UtilityFunctions.driveNumInches(MyRobot, 188, 1, 1)
             if done:
                 MyRobot.autoState = 'turn_second'
 
@@ -345,10 +425,74 @@ class AutoStates():
         elif MyRobot.autoState == 'back_up':
             done = UtilityFunctions.driveNumInches(MyRobot, '''Insert Distance''', -1, 1)
             if done:
+                MyRobot.autoState = 'raise_shooter'
+
+        elif MyRobot.autoState == 'raise_shooter':
+            done = MyRobot.shooterElev.set(1)
+            if done:
                 MyRobot.autoState = 'shoot'
 
         elif MyRobot.autoState == 'shoot':
-            done = UtilityFunctions.shootSwitch(MyRobot)
+            done = UtilityFunctions.shootScale(MyRobot)
+            if done:
+                MyRobot.autoState = 'Done'
+
+        elif MyRobot.autoState == 'Done':
+            return True
+
+
+    #Side argument is Goal position
+    def scMiddle(MyRobot, side):
+
+        if side == 'left':
+            direction = -1
+        elif side == 'right':
+            direction = 1
+
+        if MyRobot.autoState == 'begin':
+            done = UtilityFunctions.driveNumInches(MyRobot, 40, 1, 1)
+            if done:
+                MyRobot.autoState = 'turn_first'
+
+        elif MyRobot.autoState == 'turn_first':
+            done = UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
+            if done:
+                MyRobot.autoState == 'cross'
+
+        elif MyRobot.autoState == 'cross':
+            done = UtilityFunctions.driveNunInches(MyRobot, '''Insert Distance''', 1, 1)
+            if done:
+                MyRobot.autoState == 'turn_second'
+
+        elif MyRobot.autoState == 'turn_second':
+            done = UtilityFunctions.turnNumDegrees(MyRobot, 90*-direction)
+            if done:
+                MyRobot.autoState == 'forward'
+
+        elif MyRobot.autoState  == 'forward':
+            done = UtilityFunctions.driveNumInches(MyRobot, 264, 1, 1)
+            if done:
+                MyRobot.autoState = 'turn_third'
+
+        elif MyRobot.autoState == 'turn_third':
+            done = UtilityFunctions.turnNumDegrees(MyRobot, 90*direction)
+            if done:
+                MyRobot.autoState = 'raise_shooter'
+
+        #''''elif MyRobot.autoState == 'back_up':
+        #    done = UtilityFunctions.driveNumInches(MyRobot, ''InsertDistance'', -1, 1)
+        #    if done:
+        #        MyRobot.autoState = 'raise_shooter'''
+
+        elif MyRobot.autoState == 'raise_shooter':
+            pass
+            #TODO: set is not good enough for a bool return?
+            #done = MyRobot.shooterElev.set(1)
+            if done:
+                MyRobot.autoState = 'shoot'
+
+        elif MyRobot.autoState == 'shoot':
+            done = UtilityFunctions.shootScale(MyRobot)
             if done:
                 MyRobot.autoState = 'Done'
 

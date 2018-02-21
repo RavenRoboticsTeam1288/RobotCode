@@ -77,13 +77,20 @@ class MyRobot(wpilib.IterativeRobot):
 
         #Climbing Solenoids
         #Second Argument is forward channel; Third Argument is backward channel
-        self.climberLeft = wpilib.DoubleSolenoid(0, 0, 1)
-        self.climberRight = wpilib.DoubleSolenoid(0, 2, 3)
+        self.climberLeft = wpilib.DoubleSolenoid(0, 6, 7)
+        self.climberRight = wpilib.DoubleSolenoid(0, 4, 5)
+        
 
         #Shooter Pistons
         #Second Argument is forward channel; Third Argument is backward channel
-        self.shooterElev = wpilib.DoubleSolenoid(0, 4, 5)
-        self.shooterDoor = wpilib.DoubleSolenoid(0, 6, 7)
+        self.shooterElev = wpilib.DoubleSolenoid(0, 2, 3)
+        self.shooterDoor = wpilib.DoubleSolenoid(0, 1, 0)
+        
+        
+        self.climberLeft.set(0)
+        self.climberRight.set(0)
+        self.shooterElev.set(0)
+        self.shooterDoor.set(0)
         
         #robot drive
         self.robotDrive = wpilib.RobotDrive(self.leftFrontMotor,
@@ -100,6 +107,10 @@ class MyRobot(wpilib.IterativeRobot):
         ## you may need to change or remove this to match your robot
         self.robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, True)
         self.robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, True) 
+        
+        # clinbing variables
+        self.climbTggl = False
+        self.climbButtonState = False
         
         # Sensors
         
@@ -133,6 +144,8 @@ class MyRobot(wpilib.IterativeRobot):
         self.autoSlowTurnSpeed = 0.3 #slow speed
         self.autoNormalTurnSpeed = 0.6 #normal speed
         
+        self.autoComplete = False
+        
         #AutoStates variables
         
         self.autoState = "begin"
@@ -154,7 +167,7 @@ class MyRobot(wpilib.IterativeRobot):
             
             # Test Encoder
                 # Drive for 24 inches
-            done = UtilityFunctions.driveNumInches(self, 500, 1, 0.3)
+                #done = UtilityFunctions.driveNumInches(self, 500, 1, 0.3)
             # Test Gyro
                 # Turn 90 Degrees Right
                 #done = UtilityFunctions.turnNumDegrees(self, 90)
@@ -167,10 +180,10 @@ class MyRobot(wpilib.IterativeRobot):
             #wait = UtilityFunctions.waitForTime(self, 5)
             
             #done = False
-            if self.autoState == "done":
-                done = True
+            #if self.autoState == "done":
+            #    done = True
             
-            if done:
+            if self.autoComplete:
                 self.autoState = "done"
                 self.leftBackMotor.set(0)
                 self.leftFrontMotor.set(0)
@@ -190,11 +203,11 @@ class MyRobot(wpilib.IterativeRobot):
                     #Goal Switch
                     if self.autoTarget == 'switch':
                         if self.switchPos == 'left':
-                            done = AutoStates.swSameSide(self, 'left')
+                            self.autoComplete = AutoStates.swSameSide(self, 'left')
                         elif self.switchPos == 'right':
-                            done = AutoStates.swCrossSide(self, 'left')
+                            self.autoComplete = AutoStates.swCrossSide(self, 'left')
                         else:
-                            done = AutoStates.driveForward(self)
+                            self.autoComplete = AutoStates.driveForward(self)
 
                     #Goal Scale
                     elif self.autoTarget == 'scale':
@@ -205,17 +218,16 @@ class MyRobot(wpilib.IterativeRobot):
                             #Insert scLR
                             pass
                         else:
-                            #Drive Forward
-                            pass
+                            self.autoComplete = AutoStates.driveForward(self)
 
                     #No Goal
                     else:
                         if self.switchPos == 'left':
-                            done = AutoStates.swSameSide(self, 'left')
+                            self.autoComplete = AutoStates.swSameSide(self, 'left')
                         elif self.switchPos == 'right':
-                            done = AutoStates.swCrossSide(self, 'left')
+                            self.autoComplete = AutoStates.swCrossSide(self, 'left')
                         else:
-                            done = AutoStates.driveForward(self)
+                            self.autoComplete = AutoStates.driveForward(self)
 
 
                 #Starting Right
@@ -224,11 +236,11 @@ class MyRobot(wpilib.IterativeRobot):
                     #Goal Switch
                     if self.autoTarget == 'switch':
                         if self.switchPos == 'left':
-                            done = AutoStates.swCrossSide(self, 'right')
+                            self.autoComplete = AutoStates.swCrossSide(self, 'right')
                         elif self.switchPos == 'right':
-                            done = AutoStates.swSameSide(self, 'right')
+                            self.autoComplete = AutoStates.swSameSide(self, 'right')
                         else:
-                            done = AutoStates.driveForward(self)
+                            self.autoComplete = AutoStates.driveForward(self)
 
                     #Goal Scale
                     elif self.autoTarget == 'scale':
@@ -239,17 +251,16 @@ class MyRobot(wpilib.IterativeRobot):
                             #Insert scRR
                             pass
                         else:
-                            #Drive Forward
-                            pass
+                            self.autoComplete = autoStates.driveForward(self)
 
                     #No Goal
                     else:
                         if self.switchPos == 'left':
-                            done = AutoStates.swCrossSide(self, 'right')
+                            self.autoComplete = AutoStates.swCrossSide(self, 'right')
                         elif self.switchPos == 'right':
-                            done = AutoStates.swCrossSide(self, 'right')
+                            self.autoComplete = AutoStates.swCrossSide(self, 'right')
                         else:
-                            done = AutoStates.driveForward(self)
+                            self.autoComplete = AutoStates.driveForward(self)
 
 
                 #Start Center
@@ -258,11 +269,11 @@ class MyRobot(wpilib.IterativeRobot):
                     #Goal Switch
                     if self.autoTarget == 'switch':
                         if self.switchPos == 'left':
-                            done = AutoStates.swMiddle(self, 'left')
+                            self.autoComplete = AutoStates.swMiddle(self, 'left')
                         elif self.switchPos == 'right':
-                            done = AutoStates.swMiddle(self, 'right')
+                            self.autoComplete = AutoStates.swMiddle(self, 'right')
                         else:
-                            done = AutoStates.driveForward(self)
+                            self.autoComplete = AutoStates.driveForward(self)
 
                     #Goal Scale
                     elif self.autoTarget == 'scale':
@@ -273,24 +284,23 @@ class MyRobot(wpilib.IterativeRobot):
                             #Insert scCR
                             pass
                         else:
-                            #Drive Forward
-                            pass
+                            self.autoComplete = AutoStates.driveForward(self)
 
                     #No Goal
                     else:
                         if self.switchPos == 'left':
-                            done = AutoStates.swMiddle(self, 'left')
+                            self.autoComplete = AutoStates.swMiddle(self, 'left')
                         elif self.switchPos == 'right':
-                            done = AutoStates.swMiddle(self, 'right')
+                            self.autoComplete = AutoStates.swMiddle(self, 'right')
                         else:
-                            done = AutoStates.driveForward(self)
+                            self.autoComplete = AutoStates.driveForward(self)
 
                 #No Starting Position
                 else:
-                    done = AutoStates.driveForward(self)
+                    self.autoComplete = AutoStates.driveForward(self)
                     
-            if done:
-                self.autoState = "done"
+            #if done:
+            #    self.autoState = "done"
                     
             
         #except:
@@ -332,13 +342,13 @@ class MyRobot(wpilib.IterativeRobot):
 
             # SHOOT!
             
-            #Forward
+            #Forward (Pull crate into shooter wheels)
             if self.game_pad.getRawButton(8):
-                self.shooterDoor.set(1)
-            
-            #Backward
-            elif self.game_pad.getRawButton(7):
                 self.shooterDoor.set(2)
+            
+            #Backward (Extend out to hold another crate)
+            elif self.game_pad.getRawButton(7):
+                self.shooterDoor.set(1)
 
 
             #Elevate Shooter
@@ -381,14 +391,13 @@ class MyRobot(wpilib.IterativeRobot):
             elif self.stick1.getRawButton(1):
                 self.intakeMotorLeft.set(-1)
                 self.intakeMotorRight.set(1)
-            elif self.stick2.getRawButton(3):
+            elif self.stick2.getRawButton(3) or self.stick1.getRawButton(3):
                 self.intakeMotorLeft.set(0)
                 self.intakeMotorRight.set(0)
 
             
             # Climbing Controls
-            climbTggl = False
-            self.climbButtonState = False
+            
             if self.climbButtonState == False:
                 if self.game_pad.getRawButton(4) and self.climbTggl == False:
                     self.climberLeft.set(1)
@@ -399,7 +408,10 @@ class MyRobot(wpilib.IterativeRobot):
                     self.climberLeft.set(2)
                     self.climberRight.set(2)
                     self.climbButtonState = True
-                    elf.climbTggl = False
+                    self.climbTggl = False
+            if not self.game_pad.getRawButton(4):
+                    self.climbButtonState = False
+                    
         
         
         #except:

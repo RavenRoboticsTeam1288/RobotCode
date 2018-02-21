@@ -253,4 +253,25 @@ class UtilityFunctions():
                 return False
         else:
             return False
+
+    def shootScale(robot):
+        done = false
+        robot.shooterLeftFront.set(robot.fastShootSpeed)
+        robot.shooterLeftBack.set(robot.fastShootSpeed)
+        robot.shooterRightFront.set(robot.fastShootSpeed)
+        robot.shooterRightBack.set(robot.fastShootSpeed)
+        doneSpinning = waitForTime(robot, 2)
+        if doneSpinning:
+            robot.shooterDoor.set(2)
+            doneShooting = waitForTime(robot, 2)
+            if doneShooting:
+                robot.shooterLeftFront.set(0)
+                robot.shooterLeftBack.set(0)
+                robot.shooterRightFront.set(0)
+                robot.shooterRightBack.set(0)
+                return True
+            else:
+                return False
+        else:
+            return False
             
